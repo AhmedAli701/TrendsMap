@@ -12,16 +12,16 @@ import java.io.IOException;
 public class Main extends Application {
 
     public static DataSet dataSet;
-    public static Event<DataSet> dataLoaderEvent;
-    public static Event<SimpleIntegerProperty> loaderStarted;
+    public static Event<DataSet> dataLoaderFinished;
+    public static Event<SimpleIntegerProperty> dataLoaderStarted;
 
     @Override
     public void start(Stage primaryStage) throws Exception{
         // Initialize Data Set.
         dataSet = new DataSet();
-        DataLoader dataLoader = new DataLoader(new FileInputStream("D:\\data\\twitter_data.txt"), dataSet);
-        dataLoaderEvent = dataLoader.dataLoaderEvent;
-        loaderStarted = dataLoader.loaderStarted;
+        DataLoader dataLoader = new DataLoader(new FileInputStream("D:\\data\\twitter_data2.txt"), dataSet);
+        dataLoaderFinished = dataLoader.dataLoaderFinished;
+        dataLoaderStarted = dataLoader.dataLoaderStarted;
 
         // Initialize Main Scene and Show it.
         Parent root = FXMLLoader.load(getClass().getResource("layouts/Map.fxml"));

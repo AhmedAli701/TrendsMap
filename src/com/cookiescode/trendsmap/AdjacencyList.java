@@ -25,15 +25,20 @@ public class AdjacencyList<T> extends Graph {
 
     /**
      * add new vertex and it's edge to the graph.
-     * @param vertex : the vertex.
-     * @param edge : undirected edge for the given vertex.
+     * @param start the vertex to start from.
+     * @param end second vertex.
+     * @param isDirected true for directed edge, false for undirected.
      */
-    public void addVertex(Object vertex, Object edge){
-        addVertex((T)vertex);              // add vertex if not exist.
-        addVertex((T)edge);                // add second vertex if not exist.
-        addEdge((T)vertex, (T)edge);          // add undirected edge between those vertices.
+    @Override
+    public void addVertex(Object start, Object end, boolean isDirected){
+        addEdge(start, end, isDirected);
     }
 
+    /**
+     * add new vertex to the Graph.
+     * @param vertex the vertex you want to add.
+     * @return true if vertex were added or false if it's already exist.
+     */
     @Override
     public boolean addVertex(Object vertex){
         if(!graphMap.containsKey(vertex)) {
@@ -64,11 +69,29 @@ public class AdjacencyList<T> extends Graph {
         return numEdges;
     }
 
-    // add undirected edge to those vertices.
+
+    /**
+     * add an edge between two vertices in the graph,
+     * if any of the vertices doesn't exist it will
+     * added automatically to the graph.
+     * @param start first vertex.
+     * @param end second vertex.
+     * @param isDirected true for directed edge or false for undirected.
+     */
     @Override
-    public void addEdge(Object v, Object w) {
-        graphMap.get(v).add((T)w);
-        graphMap.get(w).add((T)v);
+    public void addEdge(Object start, Object end, boolean isDirected) {
+        if(!graphMap.containsKey(start))
+            addVertex(start);
+        if (!graphMap.containsKey(end))
+            addVertex(end);
+
+        if(isDirected){
+            graphMap.get(start).add((T)end);
+        }
+        else {
+            graphMap.get(start).add((T)end);
+            graphMap.get(end).add((T)start);
+        }
         numEdges++;
     }
 

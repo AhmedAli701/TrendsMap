@@ -39,3 +39,7 @@
                                                        rgba(160,170,179,31) 36%,
                                                        rgba(70,82,89,31) 100%);
 }
+
+#tweetBox{
+    -fx-border-radius: 5px;
+}

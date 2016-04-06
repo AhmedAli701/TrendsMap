@@ -1,5 +1,7 @@
 package com.cookiescode.trendsmap;
 
+import java.util.List;
+
 /**
  * Created by Ahmed Ali on 04/04/2016.
  */
@@ -27,7 +29,7 @@ public class TagInfo implements Comparable<TagInfo>{
     }
 
     public void setColor(String color) {
-        this.color = color;
+        this.color = "#" + color.substring(2, 8);
     }
 
     @Override

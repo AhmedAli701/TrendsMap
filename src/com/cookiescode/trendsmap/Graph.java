@@ -7,9 +7,9 @@ import java.util.HashSet;
  * Created by Ahmed Ali on 28/03/2016.
  */
 public abstract class Graph<T> {
-    public abstract void addVertex(T vertex, T edge);
+    public abstract void addVertex(T start, T end, boolean isDirected);
     public abstract boolean addVertex(T vertex);
-    public abstract void addEdge(T v, T w);
+    public abstract void addEdge(T start, T end, boolean isDirected);
     public abstract int getNumVertices();
     public abstract int getNumEdges();
     public abstract HashSet<T> getAdjacent(T vertex);

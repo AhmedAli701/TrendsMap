@@ -2,9 +2,11 @@ package com.cookiescode.trendsmap;
 
 import com.lynden.gmapsfx.GoogleMapView;
 import com.lynden.gmapsfx.MapComponentInitializedListener;
+import com.lynden.gmapsfx.javascript.event.UIEventType;
 import com.lynden.gmapsfx.javascript.object.*;
 import com.lynden.gmapsfx.shapes.Polyline;
 import com.lynden.gmapsfx.shapes.PolylineOptions;
+import javafx.application.Platform;
 import javafx.beans.property.SimpleIntegerProperty;
 import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
@@ -14,15 +16,15 @@ import javafx.collections.transformation.SortedList;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.*;
-import javafx.scene.layout.Background;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.scene.paint.Paint;
 import javafx.util.Callback;
+import netscape.javascript.JSObject;
 
-import javax.swing.text.html.HTML;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.ResourceBundle;
 import java.util.stream.Collectors;
@@ -39,6 +41,8 @@ public class MapController implements Initializable, MapComponentInitializedList
     @FXML private HBox panelMap;
     @FXML private ListView<TagInfo> listSelectedTags;
     @FXML private ColorPicker cpTagColors;
+    @FXML private Label lblTweets;
+    @FXML private Label lblPosition;
 
 
     private GoogleMap map;
@@ -48,12 +52,13 @@ public class MapController implements Initializable, MapComponentInitializedList
     private List<Marker> mapMarkers;
     private List<MapShape> mapShapes;
     private ObservableList<TagInfo> obSearchList;
+    private HashMap<TagInfo, Graph<Location>> tagGraphs;
 
     @Override
     public void initialize(URL location, ResourceBundle resources){
         // add listener to data loader.
-        Main.dataLoaderEvent.addListener(this, this::dataLoaded);
-        Main.loaderStarted.addListener(this, this::loaderStarted);
+        Main.dataLoaderFinished.addListener(this, this::dataLoaded);
+        Main.dataLoaderStarted.addListener(this, this::loaderStarted);
 
         panelMap.setVisible(false);
         panelLoading.setVisible(true);
@@ -64,6 +69,9 @@ public class MapController implements Initializable, MapComponentInitializedList
 
         mapMarkers = new ArrayList<>();
         mapShapes = new ArrayList<>();
+        tagGraphs = new HashMap<>();
+
+        listSelectedTags.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
     }
 
     @Override
@@ -99,9 +107,17 @@ public class MapController implements Initializable, MapComponentInitializedList
         map.zoomProperty().addListener((ObservableValue<? extends Number> obs, Number o, Number n) -> {
             lblZoom.setText(n.toString());
         });
+
+        map.addUIEventHandler(UIEventType.click, (JSObject obj) -> {
+            LatLong ll = new LatLong((JSObject) obj.getMember("latLng"));
+            lblPosition.setText(ll.toString());
+        });
     }
 
     public void btnViewOnAction(){
+        if(listSelectedTags.getSelectionModel().isEmpty())
+            return;
+
         // clean the map.
         // remove any marker on the map.
         mapMarkers.forEach(marker -> map.removeMarker(marker));
@@ -110,35 +126,36 @@ public class MapController implements Initializable, MapComponentInitializedList
         mapShapes.forEach(shape -> map.removeMapShape(shape));
         mapShapes.clear();
 
-        mapGraph = new AdjacencyList<>();
+        List<TagInfo> selectedTag = listSelectedTags.getSelectionModel().getSelectedItems();
+        selectedTag.forEach(tag -> {
+            tagGraphs.get(tag).getVertices().forEach(vertex -> {
+                // Create Location Point.
+                LatLong latLong = new LatLong(
+                        vertex.getLatitude(), vertex.getLongitude());
+                // Create Marker Options.
+                MarkerOptions markerOptions = new MarkerOptions();
+                markerOptions.position(latLong)
+                        .title(tag.getName())
+                        .animation(Animation.BOUNCE)
+                        .visible(true);
+                final Marker marker = new Marker(markerOptions);
+                map.addMarker(marker);
+                mapMarkers.add(marker);
+            });
 
-        mapGraph.getVertices().forEach(vertex -> {
-            // Create Location Point.
-            LatLong latLong = new LatLong(
-                    vertex.getLocation().getLatitude(), vertex.getLocation().getLongitude());
-            // Create Marker Options.
-            MarkerOptions markerOptions = new MarkerOptions();
-            markerOptions.position(latLong)
-                    .title(vertex.getName())
-                    .animation(Animation.BOUNCE)
-                    .visible(true);
-            final Marker marker = new Marker(markerOptions);
-            map.addMarker(marker);
-            mapMarkers.add(marker);
+            tagGraphs.get(tag).exportGraph().forEach((vertex, edges) ->
+                    edges.forEach(edge -> {
+                        LatLong loc1 = new LatLong(vertex.getLatitude(), vertex.getLongitude());
+                        LatLong loc2 = new LatLong(edge.getLatitude(), edge.getLongitude());
+                        MVCArray mvc = new MVCArray(new LatLong[]{loc1, loc2});
+                        PolylineOptions polyOpts = new PolylineOptions();
+                        polyOpts.path(mvc).strokeColor(tag.getColor()).strokeWeight(1);
+                        Polyline polyline = new Polyline(polyOpts);
+                        map.addMapShape(polyline);
+                        mapShapes.add(polyline);
+                    })
+            );
         });
-
-        mapGraph.exportGraph().forEach((vertex, edges) ->
-            edges.forEach(edge -> {
-                LatLong loc1 = new LatLong(vertex.getLocation().getLatitude(), vertex.getLocation().getLongitude());
-                LatLong loc2 = new LatLong(edge.getLocation().getLatitude(), edge.getLocation().getLongitude());
-                MVCArray mvc = new MVCArray(new LatLong[]{loc1, loc2});
-                PolylineOptions polyOpts = new PolylineOptions();
-                polyOpts.path(mvc).strokeColor("red").strokeWeight(1);
-                Polyline polyline = new Polyline(polyOpts);
-                map.addMapShape(polyline);
-                mapShapes.add(polyline);
-            })
-        );
     }
 
     private void dataLoaded(DataSet dataSet){
@@ -219,6 +236,7 @@ public class MapController implements Initializable, MapComponentInitializedList
         listHashs.setItems(sortedList.sorted());
 
         obSearchList = obHashTags;
+        Platform.runLater(() -> lblTweets.setText(lblTweetsCount.getText()));
     }
 
     private void loaderStarted(SimpleIntegerProperty count){
@@ -236,8 +254,14 @@ public class MapController implements Initializable, MapComponentInitializedList
     @FXML
     public void btnForwardOnAction(){
         if(!listHashs.getSelectionModel().isEmpty()){
-            if(!listSelectedTags.getItems().contains(listHashs.getSelectionModel().getSelectedItem())){
-                listSelectedTags.getItems().add(listHashs.getSelectionModel().getSelectedItem());
+            TagInfo selectedTag = listHashs.getSelectionModel().getSelectedItem();
+            if(!listSelectedTags.getItems().contains(selectedTag)){
+                if(!tagGraphs.containsKey(selectedTag)) {
+                    // load tweets graph.
+                    tagGraphs.put(selectedTag, GraphLoader.loadGraph(selectedTag));
+                    // add this tag to selection list.
+                    listSelectedTags.getItems().add(selectedTag);
+                }
             }
         }
     }
@@ -247,7 +271,6 @@ public class MapController implements Initializable, MapComponentInitializedList
         if(!listSelectedTags.getSelectionModel().isEmpty()){
             listSelectedTags.getItems().remove(listSelectedTags.getSelectionModel().getSelectedItem());
             listSelectedTags.refresh();
-
         }
     }
 }
