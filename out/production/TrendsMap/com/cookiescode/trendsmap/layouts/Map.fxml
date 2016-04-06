@@ -1,0 +1,210 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.effect.*?>
+<?import javafx.scene.image.*?>
+<?import javafx.scene.paint.*?>
+<?import javafx.scene.text.*?>
+<?import javafx.geometry.*?>
+<?import javafx.scene.control.*?>
+<?import java.lang.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.layout.GridPane?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
+<?import com.lynden.gmapsfx.*?>
+
+<StackPane prefHeight="400.0" prefWidth="674.0" stylesheets="@styles.css" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.cookiescode.trendsmap.MapController">
+   <children>
+      <VBox>
+         <children>
+              <HBox alignment="CENTER_LEFT" prefHeight="64.0" prefWidth="674.0" spacing="10.0" styleClass="hBar">
+                  <children>
+                  <ImageView id="imageLogo" fx:id="imageLogo" fitHeight="48.0" fitWidth="48.0" pickOnBounds="true" preserveRatio="true" />
+                  <Label layoutX="20.0" layoutY="12.0" text="Trends Map" textFill="WHITE">
+                     <font>
+                        <Font name="System Bold" size="20.0" />
+                     </font>
+                  </Label>
+                  <AnchorPane prefHeight="48.0" prefWidth="43.0" />
+                  <Button fx:id="btnForward" layoutX="268.0" layoutY="13.0" mnemonicParsing="false" onAction="#btnForwardOnAction" styleClass="btnOnBar">
+                     <graphic>
+                        <ImageView id="imageBtnForward" fitHeight="32.0" fitWidth="32.0" pickOnBounds="true" preserveRatio="true">
+                           <effect>
+                              <DropShadow />
+                           </effect>
+                        </ImageView>
+                     </graphic>
+                  </Button>
+                  <Button fx:id="btnView" layoutX="296.0" layoutY="13.0" mnemonicParsing="false" styleClass="btnOnBar">
+                     <graphic>
+                        <ImageView id="imageBtnView" fitHeight="32.0" fitWidth="32.0" pickOnBounds="true" preserveRatio="true">
+                           <effect>
+                              <DropShadow />
+                           </effect>
+                        </ImageView>
+                     </graphic>
+                  </Button>
+                  <Button fx:id="btnBackward" mnemonicParsing="false" onAction="#btnBackwardOnAction" styleClass="btnOnBar">
+                     <graphic>
+                        <ImageView id="imageBtnBackward" fitHeight="32.0" fitWidth="32.0" pickOnBounds="true" preserveRatio="true">
+                           <effect>
+                              <DropShadow />
+                           </effect></ImageView>
+                     </graphic>
+                  </Button>
+                  <AnchorPane layoutX="200.0" layoutY="10.0" prefHeight="48.0" prefWidth="78.0" HBox.hgrow="ALWAYS" />
+                  <VBox alignment="CENTER" prefHeight="48.0" prefWidth="142.0">
+                     <children>
+                        <Label prefHeight="17.0" prefWidth="135.0" text="for educational purposes" textFill="WHITE" />
+                        <Label text="UCSD Java Specilization" textFill="WHITE" />
+                     </children>
+                  </VBox>
+                  </children>
+               <padding>
+                  <Insets bottom="3.0" left="10.0" right="10.0" />
+               </padding>
+              </HBox>
+            <HBox fx:id="panelMap" VBox.vgrow="ALWAYS">
+               <children>
+                  <VBox alignment="TOP_CENTER" prefHeight="400.0" prefWidth="217.0">
+                     <children>
+                        <HBox alignment="CENTER" spacing="10.0" styleClass="hBar">
+                           <children>
+                              <TextField fx:id="txtSearch" alignment="CENTER" prefHeight="25.0" prefWidth="205.0" promptText="type search key word here..." />
+                           </children>
+                           <padding>
+                              <Insets bottom="3.0" left="3.0" right="3.0" top="3.0" />
+                           </padding>
+                           <effect>
+                              <DropShadow />
+                           </effect>
+                        </HBox>
+                        <ListView fx:id="listHashs" prefHeight="200.0" prefWidth="200.0" VBox.vgrow="ALWAYS" />
+                     </children>
+                     <HBox.margin>
+                        <Insets />
+                     </HBox.margin>
+                     <padding>
+                        <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
+                     </padding>
+                  </VBox>
+                  <VBox HBox.hgrow="ALWAYS">
+                      <children>
+                         <GoogleMapView fx:id="mapView" prefHeight="750.0" prefWidth="761.0" AnchorPane.bottomAnchor="-185.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="-441.0" AnchorPane.topAnchor="0.0" />
+                     </children>
+                     <padding>
+                        <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
+                     </padding>
+                  </VBox>
+                  <VBox alignment="CENTER" prefHeight="368.0" prefWidth="200.0">
+                     <children>
+                        <HBox alignment="CENTER" spacing="10.0" styleClass="hBar">
+                           <children>
+                              <Button mnemonicParsing="false" styleClass="btnOnBar" text="Button" textFill="WHITE">
+                                 <effect>
+                                    <DropShadow />
+                                 </effect></Button>
+                              <ColorPicker id="btnColorPicker" fx:id="cpTagColors" onHidden="#cpTagColorsOnHidden" styleClass="btnOnBar">
+                                 <effect>
+                                    <DropShadow />
+                                 </effect>
+                              </ColorPicker>
+                           </children>
+                           <padding>
+                              <Insets bottom="3.0" left="3.0" right="3.0" top="3.0" />
+                           </padding>
+                           <effect>
+                              <DropShadow />
+                           </effect>
+                        </HBox>
+                        <ListView fx:id="listSelectedTags" prefHeight="200.0" prefWidth="200.0" VBox.vgrow="ALWAYS" />
+                     </children>
+                     <padding>
+                        <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
+                     </padding>
+                  </VBox>
+               </children>
+            </HBox>
+            <HBox alignment="CENTER_LEFT" spacing="10.0" styleClass="hBar">
+               <children>
+                  <Label text="Tweets " textFill="WHITE">
+                     <font>
+                        <Font size="16.0" />
+                     </font>
+                  </Label>
+                  <Label layoutX="10.0" layoutY="10.0" text="0">
+                     <font>
+                        <Font size="16.0" />
+                     </font>
+                     <textFill>
+                        <LinearGradient endX="1.0" endY="1.0">
+                           <stops>
+                              <Stop color="#d38888" />
+                              <Stop color="#eacfcf" offset="1.0" />
+                           </stops>
+                        </LinearGradient>
+                     </textFill>
+                  </Label>
+                      <Label text="Center" textFill="WHITE">
+                     <font>
+                        <Font size="16.0" />
+                     </font></Label>
+                      <Label fx:id="lblCenter" text="Label">
+                     <font>
+                        <Font size="16.0" />
+                     </font>
+                     <textFill>
+                        <LinearGradient endX="1.0" endY="1.0">
+                           <stops>
+                              <Stop color="#ff9494" />
+                              <Stop color="#eacfcf" offset="1.0" />
+                           </stops>
+                        </LinearGradient>
+                     </textFill></Label>
+                      <Label text="Zoom" textFill="WHITE">
+                     <font>
+                        <Font size="16.0" />
+                     </font></Label>
+                      <Label fx:id="lblZoom" text="Label">
+                     <font>
+                        <Font size="16.0" />
+                     </font>
+                     <textFill>
+                        <LinearGradient endX="1.0" endY="1.0">
+                           <stops>
+                              <Stop color="#ff9494" />
+                              <Stop color="#eacfcf" offset="1.0" />
+                           </stops>
+                        </LinearGradient>
+                     </textFill></Label>
+               </children>
+            </HBox>
+         </children>
+      </VBox>
+      <VBox fx:id="panelLoading" alignment="CENTER" prefHeight="200.0" prefWidth="100.0" spacing="10.0" visible="false">
+         <children>
+            <ProgressIndicator prefHeight="122.0" prefWidth="817.0" />
+            <Label text="Loading Data">
+               <font>
+                  <Font name="System Bold" size="24.0" />
+               </font>
+            </Label>
+            <HBox alignment="CENTER">
+               <children>
+                  <Label text="Tweets : ">
+                     <font>
+                        <Font size="18.0" />
+                     </font>
+                  </Label>
+                  <Label fx:id="lblTweetsCount" text="0">
+                     <font>
+                        <Font size="18.0" />
+                     </font>
+                  </Label>
+               </children>
+            </HBox>
+         </children>
+      </VBox>
+   </children>
+</StackPane>
