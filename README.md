@@ -1,5 +1,5 @@
 # TrendsMap
-View Twitter #Hash_Tags using google Maps.  
+View Twitter #Hash_Tags using google Maps and JavaFX.  
 
 External libraries : [Joda-Time](http://www.joda.org/joda-time/) & [GMapsFX](http://rterp.github.io/GMapsFX/)
 
